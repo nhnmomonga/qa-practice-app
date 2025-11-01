@@ -386,4 +386,8 @@ if __name__ == '__main__':
     print('  管理者 - ID: admin, PW: admin_password')
     print('  ユーザー - ID: user, PW: user_password')
     
+    # 【セキュリティ警告】デバッグモードの使用について
+    # デバッグモードは開発とテスト練習には便利ですが、本番環境では絶対に使用しないでください。
+    # デバッグモードではコードの変更が自動的に反映され、エラー時に詳細な情報が表示されます。
+    # 本番環境では debug=False を使用してください。
     app.run(debug=True, host='0.0.0.0', port=5000)
