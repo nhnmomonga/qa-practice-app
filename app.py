@@ -112,9 +112,11 @@ def products_list():
     price_min = request.args.get('price_min', '')
     price_max = request.args.get('price_max', '')
     
-    # 意図的な不具合: キーワードに「バグ票」が含まれている場合は500エラー
+    # 【意図的な不具合】テスト練習用: キーワードに「バグ票」が含まれている場合は500エラー
+    # これは「エラー推測テスト」の練習のための仕様です
     if 'バグ票' in keyword:
-        raise Exception('意図的なエラー: キーワードに「バグ票」が含まれています')
+        from werkzeug.exceptions import InternalServerError
+        raise InternalServerError('意図的なエラー: キーワードに「バグ票」が含まれています')
     
     conn = get_db_connection()
     
@@ -202,7 +204,10 @@ def product_new():
                                  status=status,
                                  is_new=True)
         
-        # 商品の登録（意図的な脆弱性: XSS対策なし）
+        # 【意図的な脆弱性】テスト練習用: XSS対策なし
+        # 商品説明フィールドにHTMLタグ（<script>など）を入力すると、
+        # エスケープせずに保存されます。これは「セキュリティテスト」の練習のための仕様です。
+        # 警告: 本番環境では絶対に使用しないでください
         conn = get_db_connection()
         conn.execute(
             'INSERT INTO products (name, category, price, stock, description, status) VALUES (?, ?, ?, ?, ?, ?)',
@@ -314,7 +319,15 @@ def product_edit(product_id):
 
 @app.route('/products/<int:product_id>/delete', methods=['POST'])
 def product_delete(product_id):
-    """商品削除（意図的な不具合: 確認ダイアログなし）"""
+    """
+    商品削除
+    
+    【意図的な不具合】テスト練習用: 確認ダイアログなし
+    フロントエンドに確認ダイアログ（JavaScript confirm）が実装されていないため、
+    削除ボタンを押すと即座に商品が削除されます。
+    これは「ユーザビリティテスト」や「エラー推測テスト」の練習のための仕様です。
+    警告: 本番環境ではユーザー確認を必ず実装してください
+    """
     if 'username' not in session:
         return redirect(url_for('login'))
     

@@ -63,6 +63,9 @@
         
         <div class="form-group">
             <label for="description">商品説明</label>
+            <!-- 【意図的な脆弱性】テスト練習用: |safe フィルタによりXSS脆弱性あり -->
+            <!-- セキュリティテストの練習のため、HTMLエスケープを無効化しています -->
+            <!-- 警告: 本番環境では |safe フィルタを削除してください -->
             <textarea id="description" 
                       name="description" 
                       data-testid="product-description-input"
