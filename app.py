@@ -4,11 +4,14 @@ QA Practice App - テスト練習用Webアプリケーション
 """
 
 from flask import Flask, render_template, request, redirect, url_for, session, flash
+from werkzeug.exceptions import InternalServerError
 import sqlite3
 import os
 from datetime import datetime
 
 app = Flask(__name__)
+# 【セキュリティ警告】テスト用のハードコードされたシークレットキー
+# 本番環境では環境変数から読み込んでください（例: os.environ.get('SECRET_KEY')）
 app.secret_key = 'qa-practice-app-secret-key-for-testing'
 
 # データベースファイルのパス
@@ -115,7 +118,6 @@ def products_list():
     # 【意図的な不具合】テスト練習用: キーワードに「バグ票」が含まれている場合は500エラー
     # これは「エラー推測テスト」の練習のための仕様です
     if 'バグ票' in keyword:
-        from werkzeug.exceptions import InternalServerError
         raise InternalServerError('意図的なエラー: キーワードに「バグ票」が含まれています')
     
     conn = get_db_connection()
