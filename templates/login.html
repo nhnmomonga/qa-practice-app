@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block title %}ログイン - QA Practice App{% endblock %}
+
+{% block content %}
+<div class="card" style="max-width: 400px; margin: 2rem auto;">
+    <h2 style="margin-bottom: 1.5rem; text-align: center;">ログイン</h2>
+    
+    <form method="POST" action="{{ url_for('login') }}" data-testid="login-form">
+        <div class="form-group">
+            <label for="username">ユーザーID</label>
+            <input type="text" 
+                   id="username" 
+                   name="username" 
+                   data-testid="username-input"
+                   required>
+        </div>
+        
+        <div class="form-group">
+            <label for="password">パスワード</label>
+            <input type="password" 
+                   id="password" 
+                   name="password" 
+                   data-testid="password-input"
+                   required>
+        </div>
+        
+        <button type="submit" 
+                class="btn btn-primary" 
+                data-testid="login-submit"
+                style="width: 100%;">ログイン</button>
+    </form>
+    
+    <div style="margin-top: 2rem; padding: 1rem; background-color: #f8f9fa; border-radius: 4px;">
+        <p style="font-size: 0.9rem; margin-bottom: 0.5rem;"><strong>テスト用アカウント:</strong></p>
+        <p style="font-size: 0.85rem; margin: 0.25rem 0;">管理者: ID: <code>admin</code> / PW: <code>admin_password</code></p>
+        <p style="font-size: 0.85rem; margin: 0.25rem 0;">ユーザー: ID: <code>user</code> / PW: <code>user_password</code></p>
+    </div>
+</div>
+{% endblock %}

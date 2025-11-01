@@ -1,0 +1,126 @@
+{% extends "base.html" %}
+
+{% block title %}商品一覧 - QA Practice App{% endblock %}
+
+{% block content %}
+<h2 style="margin-bottom: 1.5rem;">商品一覧</h2>
+
+<!-- 検索フォーム -->
+<div class="search-form">
+    <h3 style="margin-bottom: 1rem;">商品検索</h3>
+    <form method="GET" action="{{ url_for('products_list') }}" data-testid="search-form">
+        <div class="search-fields">
+            <div class="form-group" style="margin-bottom: 0;">
+                <label for="keyword">キーワード</label>
+                <input type="text" 
+                       id="keyword" 
+                       name="keyword" 
+                       data-testid="search-keyword"
+                       value="{{ request.args.get('keyword', '') }}"
+                       placeholder="商品名で検索">
+            </div>
+            
+            <div class="form-group" style="margin-bottom: 0;">
+                <label for="category">カテゴリ</label>
+                <select id="category" 
+                        name="category" 
+                        data-testid="search-category">
+                    <option value="">すべて</option>
+                    <option value="書籍" {% if request.args.get('category') == '書籍' %}selected{% endif %}>書籍</option>
+                    <option value="家電" {% if request.args.get('category') == '家電' %}selected{% endif %}>家電</option>
+                    <option value="食品" {% if request.args.get('category') == '食品' %}selected{% endif %}>食品</option>
+                    <option value="その他" {% if request.args.get('category') == 'その他' %}selected{% endif %}>その他</option>
+                </select>
+            </div>
+            
+            <div class="form-group" style="margin-bottom: 0;">
+                <label for="price_min">価格（下限）</label>
+                <input type="number" 
+                       id="price_min" 
+                       name="price_min" 
+                       data-testid="search-price-min"
+                       value="{{ request.args.get('price_min', '') }}"
+                       placeholder="例: 1000">
+            </div>
+            
+            <div class="form-group" style="margin-bottom: 0;">
+                <label for="price_max">価格（上限）</label>
+                <input type="number" 
+                       id="price_max" 
+                       name="price_max" 
+                       data-testid="search-price-max"
+                       value="{{ request.args.get('price_max', '') }}"
+                       placeholder="例: 10000">
+            </div>
+        </div>
+        
+        <div class="button-group">
+            <a href="{{ url_for('products_list') }}" 
+               class="btn btn-secondary"
+               data-testid="search-clear">クリア</a>
+            <button type="submit" 
+                    class="btn btn-primary"
+                    data-testid="search-submit">検索</button>
+        </div>
+    </form>
+</div>
+
+<!-- 商品一覧テーブル -->
+<div class="card">
+    {% if products %}
+    <table data-testid="products-table">
+        <thead>
+            <tr>
+                <th>商品ID</th>
+                <th>商品名</th>
+                <th>カテゴリ</th>
+                <th>価格</th>
+                <th>在庫数</th>
+                <th>ステータス</th>
+                <th>操作</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for product in products %}
+            <tr class="{{ product.stock | stock_color }}" 
+                data-testid="product-row-{{ product.id }}">
+                <td data-testid="product-id">{{ product.id }}</td>
+                <td data-testid="product-name">{{ product.name }}</td>
+                <td data-testid="product-category">{{ product.category }}</td>
+                <td data-testid="product-price">{{ product.price | number_format }}円</td>
+                <td data-testid="product-stock">
+                    {{ product.stock }}個
+                    <span style="font-size: 0.85rem; color: #666;">
+                        ({{ product.stock | stock_status }})
+                    </span>
+                </td>
+                <td data-testid="product-status">{{ product.status }}</td>
+                <td class="actions">
+                    {% if session.role in ['admin', 'user'] %}
+                    <a href="{{ url_for('product_edit', product_id=product.id) }}" 
+                       class="btn btn-primary"
+                       data-testid="edit-button-{{ product.id }}">編集</a>
+                    {% endif %}
+                    
+                    {% if session.role == 'admin' %}
+                    <form method="POST" 
+                          action="{{ url_for('product_delete', product_id=product.id) }}"
+                          style="display: inline;"
+                          data-testid="delete-form-{{ product.id }}">
+                        <button type="submit" 
+                                class="btn btn-danger"
+                                data-testid="delete-button-{{ product.id }}">削除</button>
+                    </form>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    
+    <p style="margin-top: 1rem; color: #666;">全 {{ products | length }} 件</p>
+    {% else %}
+    <p data-testid="no-products">検索条件に一致する商品が見つかりませんでした。</p>
+    {% endif %}
+</div>
+{% endblock %}
