@@ -1,0 +1,188 @@
+{% extends "base.html" %}
+
+{% block title %}{% if is_new %}商品登録{% else %}商品編集{% endif %} - QA Practice App{% endblock %}
+
+{% block content %}
+<h2 style="margin-bottom: 1.5rem;">
+    {% if is_new %}商品登録{% else %}商品編集 (ID: {{ product.id }}){% endif %}
+</h2>
+
+<div class="card">
+    <form method="POST" data-testid="product-form">
+        <div class="form-group">
+            <label for="name">商品名 <span style="color: red;">*</span></label>
+            <input type="text" 
+                   id="name" 
+                   name="name" 
+                   data-testid="product-name-input"
+                   value="{% if product %}{{ product.name }}{% else %}{{ name }}{% endif %}"
+                   maxlength="50"
+                   required>
+            <small style="color: #666;">1文字以上、50文字以下</small>
+        </div>
+        
+        <div class="form-group">
+            <label for="category">カテゴリ <span style="color: red;">*</span></label>
+            <select id="category" 
+                    name="category" 
+                    data-testid="product-category-select"
+                    required>
+                {% set current_category = product.category if product else category %}
+                <option value="書籍" {% if current_category == '書籍' %}selected{% endif %}>書籍</option>
+                <option value="家電" {% if current_category == '家電' %}selected{% endif %}>家電</option>
+                <option value="食品" {% if current_category == '食品' %}selected{% endif %}>食品</option>
+                <option value="その他" {% if current_category == 'その他' %}selected{% endif %}>その他</option>
+            </select>
+        </div>
+        
+        <div class="form-group">
+            <label for="price">価格（円） <span style="color: red;">*</span></label>
+            <input type="number" 
+                   id="price" 
+                   name="price" 
+                   data-testid="product-price-input"
+                   value="{% if product %}{{ product.price }}{% else %}{{ price }}{% endif %}"
+                   min="0"
+                   max="1000000"
+                   required>
+            <small style="color: #666;">0円以上、1,000,000円以下</small>
+        </div>
+        
+        <div class="form-group">
+            <label for="stock">在庫数（個） <span style="color: red;">*</span></label>
+            <input type="number" 
+                   id="stock" 
+                   name="stock" 
+                   data-testid="product-stock-input"
+                   value="{% if product %}{{ product.stock }}{% else %}{{ stock }}{% endif %}"
+                   min="0"
+                   max="999"
+                   required>
+            <small style="color: #666;">0個以上、999個以下</small>
+        </div>
+        
+        <div class="form-group">
+            <label for="description">商品説明</label>
+            <!-- 【意図的な脆弱性】テスト練習用: |safe フィルタによりXSS脆弱性あり -->
+            <!-- セキュリティテストの練習のため、HTMLエスケープを無効化しています -->
+            <!-- 警告: 本番環境では |safe フィルタを削除してください -->
+            <textarea id="description" 
+                      name="description" 
+                      data-testid="product-description-input"
+                      rows="5">{% if product %}{{ product.description|safe }}{% else %}{{ description }}{% endif %}</textarea>
+            <small style="color: #666;">任意入力</small>
+        </div>
+        
+        <div class="form-group">
+            <label>ステータス <span style="color: red;">*</span></label>
+            {% set current_status = product.status if product else status %}
+            
+            {% if is_new %}
+            <!-- 新規登録時は「準備中」固定 -->
+            <div>
+                <input type="radio" 
+                       id="status_preparing" 
+                       name="status" 
+                       value="準備中" 
+                       checked
+                       disabled>
+                <label for="status_preparing" style="display: inline; font-weight: normal;">準備中（新規登録時は固定）</label>
+            </div>
+            {% else %}
+            <!-- 編集時は遷移ルールに基づく選択肢 -->
+            {% if current_status == '準備中' %}
+            <div>
+                <input type="radio" 
+                       id="status_preparing" 
+                       name="status" 
+                       value="準備中" 
+                       data-testid="status-preparing"
+                       checked>
+                <label for="status_preparing" style="display: inline; font-weight: normal;">準備中</label>
+            </div>
+            <div>
+                <input type="radio" 
+                       id="status_public" 
+                       name="status" 
+                       value="公開中"
+                       data-testid="status-public">
+                <label for="status_public" style="display: inline; font-weight: normal;">公開中</label>
+            </div>
+            <div>
+                <input type="radio" 
+                       id="status_private" 
+                       name="status" 
+                       value="非公開"
+                       data-testid="status-private">
+                <label for="status_private" style="display: inline; font-weight: normal;">非公開</label>
+            </div>
+            {% elif current_status == '公開中' %}
+            <div>
+                <input type="radio" 
+                       id="status_public" 
+                       name="status" 
+                       value="公開中"
+                       data-testid="status-public"
+                       checked>
+                <label for="status_public" style="display: inline; font-weight: normal;">公開中</label>
+            </div>
+            <div>
+                <input type="radio" 
+                       id="status_private" 
+                       name="status" 
+                       value="非公開"
+                       data-testid="status-private">
+                <label for="status_private" style="display: inline; font-weight: normal;">非公開</label>
+            </div>
+            <small style="color: #666; display: block; margin-top: 0.5rem;">
+                ※ 「公開中」から「準備中」への遷移はできません
+            </small>
+            {% elif current_status == '非公開' %}
+            <div>
+                <input type="radio" 
+                       id="status_private" 
+                       name="status" 
+                       value="非公開"
+                       data-testid="status-private"
+                       checked>
+                <label for="status_private" style="display: inline; font-weight: normal;">非公開</label>
+            </div>
+            <div>
+                <input type="radio" 
+                       id="status_public" 
+                       name="status" 
+                       value="公開中"
+                       data-testid="status-public">
+                <label for="status_public" style="display: inline; font-weight: normal;">公開中</label>
+            </div>
+            <small style="color: #666; display: block; margin-top: 0.5rem;">
+                ※ 「非公開」から「準備中」への遷移はできません
+            </small>
+            {% endif %}
+            {% endif %}
+        </div>
+        
+        <div class="button-group">
+            <a href="{{ url_for('products_list') }}" 
+               class="btn btn-secondary"
+               data-testid="cancel-button">キャンセル</a>
+            <button type="submit" 
+                    class="btn btn-success"
+                    data-testid="submit-button">
+                {% if is_new %}登録{% else %}更新{% endif %}
+            </button>
+        </div>
+    </form>
+</div>
+
+{% if not is_new and product %}
+<div style="margin-top: 1.5rem; padding: 1rem; background-color: #f8f9fa; border-radius: 4px;">
+    <h4 style="margin-bottom: 0.5rem;">ステータス遷移ルール</h4>
+    <ul style="font-size: 0.9rem; line-height: 1.8;">
+        <li>「準備中」→「公開中」または「非公開」に遷移可能</li>
+        <li>「公開中」→「非公開」にのみ遷移可能</li>
+        <li>「非公開」→「公開中」にのみ遷移可能</li>
+    </ul>
+</div>
+{% endif %}
+{% endblock %}
