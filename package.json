@@ -1,0 +1,15 @@
+{
+  "name": "qa-practice-app",
+  "version": "1.0.0",
+  "description": "> **⚠️ 重要な警告** >  > このアプリケーションは**教育目的のみ**で作成されており、**意図的にセキュリティ脆弱性と不具合が含まれています**。 >  > - XSS（クロスサイトスクリプティング）脆弱性 > - ユーザビリティ上の問題 > - エラーハンドリングの不備 >  > **絶対に本番環境では使用しないでください。**",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@playwright/test": "^1.56.1"
+  }
+}
